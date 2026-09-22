@@ -26,8 +26,8 @@ export function TaskList({ tasks, showCompletedTasks, expanded, onChange, onTogg
     setEditingTitle('')
   }
   const cancelEdit = () => { setEditingId(null); setEditingTitle('') }
-  const add = () => {
-    const title = draft.trim()
+  const add = (value = draft) => {
+    const title = value.trim()
     if (!title) return
     onChange([...tasks, { id: crypto.randomUUID(), title, done: false, source: 'local' }])
     setDraft('')
@@ -37,8 +37,8 @@ export function TaskList({ tasks, showCompletedTasks, expanded, onChange, onTogg
   // expanded is 50vw × 50vh and returns to compact using the collapse control.
   const panelSize = expanded
     ? 'h-[50vh] w-[50vw] max-h-[calc(100vh-32px)] max-w-[calc(100vw-32px)] rounded-[12px]'
-    : 'h-[172px] w-[526px] max-w-[calc(100vw-32px)] rounded-[10px]'
-  const shown = expanded ? visible : visible.slice(0, 3)
+    : 'w-[526px] max-w-[calc(100vw-32px)] rounded-[10px]'
+  const shown = visible
 
   return <section className={`luxe-glass-surface luxe-glass-surface--panel luxe-glass-surface--dark-panel overflow-hidden text-white shadow-[0_28px_80px_rgba(0,0,0,.48)] transition-[width,height,border-radius] duration-300 ease-out ${panelSize}`}>
     {expanded ? <div className="luxe-task-surface-content grid h-full grid-cols-[286px_minmax(0,1fr)] bg-[radial-gradient(circle_at_88%_96%,rgba(14,29,37,.68),transparent_38%),radial-gradient(circle_at_28%_12%,rgba(70,49,42,.36),transparent_42%),linear-gradient(145deg,rgba(43,31,28,.96),rgba(28,25,25,.96)_38%,rgba(12,17,22,.98))] max-md:grid-cols-1">
@@ -48,10 +48,10 @@ export function TaskList({ tasks, showCompletedTasks, expanded, onChange, onTogg
         <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-4"><TaskRows tasks={shown} toggle={toggle} editingId={editingId} editingTitle={editingTitle} onEditTitleChange={setEditingTitle} onEditStart={beginEdit} onEditCommit={commitEdit} onEditCancel={cancelEdit} emptyClass="flex h-full items-center justify-center" /></div>
         <TaskInput draft={draft} setDraft={setDraft} add={add} expanded />
       </section>
-    </div> : <div className="relative h-full bg-[radial-gradient(circle_at_94%_110%,rgba(18,33,40,.7),transparent_45%),radial-gradient(circle_at_18%_0%,rgba(61,45,39,.34),transparent_36%),linear-gradient(135deg,rgba(16,18,20,.98),rgba(18,16,17,.95)_52%,rgba(13,16,20,.98))] px-7 py-6">
+    </div> : <div className="relative flex max-h-[calc(100vh-32px)] flex-col bg-[radial-gradient(circle_at_94%_110%,rgba(18,33,40,.7),transparent_45%),radial-gradient(circle_at_18%_0%,rgba(61,45,39,.34),transparent_36%),linear-gradient(135deg,rgba(16,18,20,.98),rgba(18,16,17,.95)_52%,rgba(13,16,20,.98))] px-7 py-6">
       <TaskHeader expanded={false} onExpand={() => onExpandedChange(true)} onToggleCompleted={onToggleCompleted} />
-      <div className="space-y-2"><TaskRows tasks={shown} toggle={toggle} editingId={editingId} editingTitle={editingTitle} onEditTitleChange={setEditingTitle} onEditStart={beginEdit} onEditCommit={commitEdit} onEditCancel={cancelEdit} compact /></div>
-      <div className="mt-4"><TaskInput draft={draft} setDraft={setDraft} add={add} /></div>
+      <div className="max-h-[calc(100vh-160px)] overflow-y-auto overscroll-contain space-y-2 pr-1"><TaskRows tasks={shown} toggle={toggle} editingId={editingId} editingTitle={editingTitle} onEditTitleChange={setEditingTitle} onEditStart={beginEdit} onEditCommit={commitEdit} onEditCancel={cancelEdit} compact /></div>
+      <div className="mt-2 shrink-0"><TaskInput draft={draft} setDraft={setDraft} add={add} /></div>
     </div>}
   </section>
 }
@@ -90,10 +90,14 @@ function TaskView({ label, count, active = false }: { label: string; count: numb
   return <button type="button" className={`flex h-12 w-full items-center gap-3 rounded-xl px-3 text-left text-[16px] font-semibold transition ${active ? 'bg-white/13 text-white shadow-[inset_0_1px_0_rgba(255,255,255,.08)]' : 'text-white/88 hover:bg-white/8'}`}><span className="size-5 rounded-md border border-current/40" /><span className="min-w-0 flex-1 truncate">{label}</span><span className="text-[16px] tabular-nums text-white/42">{count}</span></button>
 }
 
-function TaskInput({ draft, setDraft, add, expanded = false }: { draft: string; setDraft(value: string): void; add(): void; expanded?: boolean }) {
+function TaskInput({ draft, setDraft, add, expanded = false }: { draft: string; setDraft(value: string): void; add(value?: string): void; expanded?: boolean }) {
   return <div className={`flex items-center gap-3 ${expanded ? 'border-t border-white/10 px-7 py-5' : 'px-0 pt-2'}`}>
     <PlusIcon className={expanded ? 'size-5 shrink-0 text-white/45' : 'size-5 shrink-0 text-white/45'} />
-    <input value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => event.key === 'Enter' && add()} placeholder="Thêm task" aria-label="Thêm task" className={`min-w-0 flex-1 bg-transparent font-semibold text-white outline-none placeholder:text-white/42 ${expanded ? 'text-[calc(17px*var(--task-font-scale,0.88))] leading-6' : 'text-[calc(16px*var(--task-font-scale,0.88))] leading-6'}`} />
-    {expanded && <button type="button" onClick={add} className="luxe-glass-surface luxe-glass-surface--action h-9 rounded-full px-3 text-[13px] font-semibold text-white">Thêm</button>}
+    <input value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => {
+      if (event.key !== 'Enter' || event.repeat || event.nativeEvent.isComposing) return
+      event.preventDefault()
+      add(event.currentTarget.value)
+    }} placeholder="Thêm task" aria-label="Thêm task" className={`min-w-0 flex-1 bg-transparent font-semibold text-white outline-none placeholder:text-white/42 ${expanded ? 'text-[calc(17px*var(--task-font-scale,0.88))] leading-6' : 'text-[calc(16px*var(--task-font-scale,0.88))] leading-6'}`} />
+    {expanded && <button type="button" onClick={() => add()} className="luxe-glass-surface luxe-glass-surface--action h-9 rounded-full px-3 text-[13px] font-semibold text-white">Thêm</button>}
   </div>
 }
