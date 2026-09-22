@@ -1,0 +1,114 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Baby Care 3D icon</title>
+  <desc id="desc">A soft 3D baby care icon with a baby face, milk bottle, heart and reminder clock in pastel glass style.</desc>
+  <defs>
+    <linearGradient id="base" x1="92" y1="58" x2="420" y2="458" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7ED"/>
+      <stop offset="0.42" stop-color="#FBCFE8"/>
+      <stop offset="1" stop-color="#BAE6FD"/>
+    </linearGradient>
+    <linearGradient id="baseEdge" x1="120" y1="78" x2="392" y2="448" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.95"/>
+      <stop offset="0.55" stop-color="#FDF2F8" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#7DD3FC" stop-opacity="0.4"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(180 114) rotate(55) scale(250 216)">
+      <stop stop-color="#FFFFFF" stop-opacity="0.95"/>
+      <stop offset="0.38" stop-color="#FFFFFF" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="skin" x1="169" y1="143" x2="335" y2="337" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7E8"/>
+      <stop offset="0.52" stop-color="#FFD8BB"/>
+      <stop offset="1" stop-color="#F6A9B7"/>
+    </linearGradient>
+    <linearGradient id="skinShade" x1="204" y1="175" x2="306" y2="316" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.68"/>
+      <stop offset="1" stop-color="#F472B6" stop-opacity="0.16"/>
+    </linearGradient>
+    <linearGradient id="bottle" x1="103" y1="247" x2="188" y2="386" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="0.5" stop-color="#E0F2FE"/>
+      <stop offset="1" stop-color="#93C5FD"/>
+    </linearGradient>
+    <linearGradient id="bottleMilk" x1="116" y1="292" x2="170" y2="384" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7ED"/>
+      <stop offset="1" stop-color="#FED7AA"/>
+    </linearGradient>
+    <linearGradient id="clock" x1="322" y1="315" x2="422" y2="427" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="0.38" stop-color="#CFFAFE"/>
+      <stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+    <linearGradient id="heart" x1="339" y1="114" x2="405" y2="189" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDA4AF"/>
+      <stop offset="1" stop-color="#EC4899"/>
+    </linearGradient>
+    <filter id="softShadow" x="30" y="36" width="452" height="454" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="28" stdDeviation="25" flood-color="#0F172A" flood-opacity="0.22"/>
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#BE185D" flood-opacity="0.14"/>
+    </filter>
+    <filter id="objectShadow" x="54" y="72" width="406" height="400" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#7C2D12" flood-opacity="0.18"/>
+    </filter>
+    <filter id="innerGlow" x="100" y="104" width="312" height="282" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feOffset dy="5"/>
+      <feComposite in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.45 0 0 0 0 0.65 0 0 0 0.16 0"/>
+      <feBlend in2="SourceGraphic" mode="soft-light"/>
+    </filter>
+    <clipPath id="baseClip">
+      <rect x="70" y="54" width="372" height="372" rx="96"/>
+    </clipPath>
+  </defs>
+
+  <ellipse cx="256" cy="442" rx="138" ry="34" fill="#0F172A" opacity="0.14"/>
+
+  <g filter="url(#softShadow)">
+    <rect x="70" y="54" width="372" height="372" rx="96" fill="url(#base)"/>
+    <rect x="78" y="62" width="356" height="356" rx="88" stroke="url(#baseEdge)" stroke-width="16"/>
+    <g clip-path="url(#baseClip)">
+      <circle cx="159" cy="107" r="166" fill="url(#glow)"/>
+      <circle cx="407" cy="94" r="104" fill="#FFFFFF" opacity="0.16"/>
+      <circle cx="111" cy="349" r="116" fill="#0EA5E9" opacity="0.09"/>
+      <path d="M93 133C118 84 171 65 229 78" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" opacity="0.42"/>
+    </g>
+  </g>
+
+  <g filter="url(#objectShadow)">
+    <path d="M134 227C134 193 160 164 193 160C203 125 228 106 256 106C284 106 309 125 319 160C352 164 378 193 378 227C378 282 331 334 256 334C181 334 134 282 134 227Z" fill="url(#skin)"/>
+    <path d="M134 227C134 193 160 164 193 160C203 125 228 106 256 106C284 106 309 125 319 160C352 164 378 193 378 227C378 282 331 334 256 334C181 334 134 282 134 227Z" fill="url(#skinShade)" filter="url(#innerGlow)"/>
+    <circle cx="162" cy="226" r="24" fill="#FFD1BE"/>
+    <circle cx="350" cy="226" r="24" fill="#F8B7C2"/>
+    <path d="M247 126C263 119 281 124 290 139C276 136 262 142 253 154" stroke="#92400E" stroke-width="13" stroke-linecap="round"/>
+    <circle cx="219" cy="226" r="8" fill="#3F2A2A"/>
+    <circle cx="293" cy="226" r="8" fill="#3F2A2A"/>
+    <circle cx="197" cy="253" r="18" fill="#FB7185" opacity="0.22"/>
+    <circle cx="315" cy="253" r="18" fill="#FB7185" opacity="0.22"/>
+    <path d="M229 269C245 283 267 283 283 269" stroke="#7C2D12" stroke-width="10" stroke-linecap="round"/>
+    <path d="M240 246C250 252 262 252 272 246" stroke="#B45309" stroke-width="7" stroke-linecap="round" opacity="0.65"/>
+  </g>
+
+  <g filter="url(#objectShadow)">
+    <path d="M113 252C113 238 124 227 138 227H159C173 227 184 238 184 252V372C184 392 168 408 148 408C129 408 113 392 113 372V252Z" fill="url(#bottle)"/>
+    <path d="M125 300H172V371C172 384 161 395 148 395C135 395 125 384 125 371V300Z" fill="url(#bottleMilk)"/>
+    <path d="M124 250H173" stroke="#FBCFE8" stroke-width="18" stroke-linecap="round"/>
+    <path d="M136 213H160C167 213 173 219 173 226V237H123V226C123 219 129 213 136 213Z" fill="#F9A8D4"/>
+    <path d="M133 328H163M133 352H157" stroke="#60A5FA" stroke-width="7" stroke-linecap="round" opacity="0.55"/>
+    <path d="M137 241C129 250 126 262 126 281" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.75"/>
+  </g>
+
+  <g filter="url(#objectShadow)">
+    <circle cx="376" cy="372" r="56" fill="url(#clock)"/>
+    <circle cx="376" cy="372" r="41" fill="#FFFFFF" opacity="0.75"/>
+    <path d="M376 346V374L397 386" stroke="#075985" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M340 325L325 307M411 325L426 307" stroke="#0EA5E9" stroke-width="11" stroke-linecap="round"/>
+    <circle cx="376" cy="372" r="6" fill="#075985"/>
+  </g>
+
+  <g filter="url(#objectShadow)">
+    <path d="M373 190C356 174 326 154 326 130C326 112 340 101 356 101C367 101 376 107 383 117C390 107 399 101 410 101C426 101 440 112 440 130C440 154 410 174 393 190C388 195 378 195 373 190Z" fill="url(#heart)"/>
+    <path d="M345 120C350 112 359 110 368 116" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.55"/>
+  </g>
+</svg>

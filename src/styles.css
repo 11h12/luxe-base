@@ -1,0 +1,16 @@
+@import "tailwindcss";
+html, body, #root { min-width: 320px; min-height: 100%; margin: 0; }
+body { font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; }
+button, input { font: inherit; }
+
+/* Recovered from the legacy `luxe-glass-surface` rules. */
+:root { --luxe-glass-border: #fff3; --luxe-glass-background: #0000000d; --luxe-glass-panel-background: #0f0f0fd1; --luxe-glass-action-hover-background: #ffffff21; --luxe-glass-action-hover-border: #ffffff61; --luxe-glass-action-hover-foreground: #fff; --luxe-floating-glass-background: #07110f8f; --luxe-floating-glass-border: #ffffff2e; --luxe-floating-glass-hover-background: #07110fb8; --luxe-floating-glass-hover-border: #ffffff52; --luxe-floating-glass-foreground: #fff; }
+.luxe-glass-surface { border: 1px solid var(--luxe-glass-border); background-color: var(--luxe-glass-background); backdrop-filter: blur(4px); }
+.luxe-glass-surface--panel { background-color: var(--luxe-glass-panel-background); backdrop-filter: blur(20px) saturate(140%); box-shadow: 0 24px 72px #0f172a38; }
+.luxe-glass-surface--dark-panel { border-color: var(--luxe-floating-glass-border)!important; background-color: #07110fe0!important; backdrop-filter: blur(24px) saturate(140%)!important; box-shadow: 0 28px 80px #0000007a; }
+.luxe-glass-surface--action:not(.luxe-glass-surface--active) { border-color: var(--luxe-floating-glass-border)!important; background-color: var(--luxe-floating-glass-background)!important; backdrop-filter: blur(8px)!important; }
+.luxe-glass-action { border: 1px solid transparent; background-color: transparent; transition: background-color .18s, border-color .18s, color .18s, transform .18s; }
+.luxe-glass-action:hover { transform: translateY(-1px); }
+.luxe-glass-action:hover, .luxe-glass-action:focus-visible, button.luxe-glass-surface:hover, button.luxe-glass-surface:focus-visible { border-color: var(--luxe-glass-action-hover-border)!important; background-color: var(--luxe-glass-action-hover-background)!important; color: var(--luxe-glass-action-hover-foreground)!important; }
+.group:hover .luxe-glass-surface--action:not(.luxe-glass-surface--active), .group:focus-visible .luxe-glass-surface--action:not(.luxe-glass-surface--active), .luxe-glass-surface--action:not(.luxe-glass-surface--active):hover, .luxe-glass-surface--action:not(.luxe-glass-surface--active):focus-visible { border-color: var(--luxe-floating-glass-hover-border)!important; background-color: var(--luxe-floating-glass-hover-background)!important; color: var(--luxe-floating-glass-foreground)!important; }
+.luxe-note-surface { background-color: transparent; backdrop-filter: saturate(200%) blur(24px); }

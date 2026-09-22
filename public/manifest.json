@@ -1,0 +1,47 @@
+{
+"update_url": "https://clients2.google.com/service/update2/crx",
+
+  "manifest_version": 3,
+  "name": "Luxe New Tab: Focus, Tasks & Calendar",
+  "short_name": "Luxe New Tab",
+  "version": "2.5.24",
+  "description": "Transform every new tab into a focus dashboard with tasks, calendar, weather, notes, mantras, and beautiful wallpapers.",
+  "icons": {
+    "16": "icons/logo.png",
+    "48": "icons/logo.png",
+    "128": "icons/logo.png"
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "permissions": [
+    "activeTab",
+    "identity",
+    "topSites",
+    "notifications",
+    "tts"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "https://*.vercel.app/*",
+    "https://api.unsplash.com/*",
+    "https://api.openai.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://tasks.googleapis.com/*",
+    "https://www.googleapis.com/*"
+  ],
+  "action": {
+    "default_title": "Luxe settings"
+  },
+  "oauth2": {
+    "client_id": "406242324409-klospfumhui9ubpou21ild5r2iafkao7.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/calendar.readonly",
+      "https://www.googleapis.com/auth/tasks",
+      "https://www.googleapis.com/auth/userinfo.email"
+    ]
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; frame-src 'self' https://open.spotify.com https://www.youtube.com https://www.youtube-nocookie.com https://www.youtube.com/embed/; connect-src 'self' http://localhost:3000 https://*.vercel.app https://api.unsplash.com https://api.open-meteo.com https://api.openstreetmap.org https://nominatim.openstreetmap.org https://ipapi.co https://ipinfo.io https://workers.luxestart.workers.dev https://www.googleapis.com https://tasks.googleapis.com https://api.openai.com https://generativelanguage.googleapis.com https://www.vang.today;"
+  }
+}

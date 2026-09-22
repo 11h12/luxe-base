@@ -1,0 +1,10 @@
+# Local dependency/runtime artefacts
+node_modules/
+.pnpm-store/
+dist/
+*.tsbuildinfo
+
+# Keep only the compiled extension assets referenced by newtab.html.
+assets/*
+!assets/build-CSbNfWqf.js
+!assets/build-Aanw5DNc.css

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Luxe Spotify Wrapper</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: transparent;
+      }
+      .wrap {
+        height: 100%;
+        width: 100%;
+        display: flex;
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        border-radius: 16px;
+        background: transparent;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <iframe
+        id="spotify"
+        src="about:blank"
+        allow="autoplay *; clipboard-write; encrypted-media *; fullscreen; picture-in-picture"
+        loading="eager"
+      ></iframe>
+    </div>
+
+    <script>
+      const spotifyEl = document.getElementById("spotify");
+
+      // Sanitize: chỉ cho phép open.spotify.com/embed/*
+      const isSafeSpotifyEmbed = (url) => {
+        try {
+          const u = new URL(url);
+          return (
+            u.origin === "https://open.spotify.com" &&
+            u.pathname.startsWith("/embed/")
+          );
+        } catch {
+          return false;
+        }
+      };
+
+      // Nhận lệnh từ parent (New Tab)
+      window.addEventListener("message", (e) => {
+        const msg = e?.data;
+        if (!msg || typeof msg !== "object") return;
+
+        if (msg.type === "LUXE_SPOTIFY_SET_SRC") {
+          const next = msg.src;
+          if (typeof next === "string" && isSafeSpotifyEmbed(next)) {
+            const url = new URL(next);
+            url.searchParams.set("autoplay", "1");
+            url.searchParams.set("utm_source", "luxe");
+            spotifyEl.src = url.toString();
+          }
+        }
+
+        if (msg.type === "LUXE_SPOTIFY_PLAY") {
+          const next = msg.src;
+          if (typeof next === "string" && isSafeSpotifyEmbed(next)) {
+            const url = new URL(next);
+            url.searchParams.set("autoplay", "1");
+            url.searchParams.set("utm_source", "luxe");
+            // cache-bust to force a reload/play
+            url.searchParams.set("_ts", String(Date.now()));
+            spotifyEl.src = url.toString();
+          }
+        }
+
+        if (msg.type === "LUXE_SPOTIFY_SET_HEIGHT") {
+          const h = Number(msg.height);
+          if (Number.isFinite(h) && h > 0) {
+            document.documentElement.style.height = h + "px";
+            document.body.style.height = h + "px";
+            spotifyEl.style.height = h + "px";
+          }
+        }
+      });
+
+      // báo parent là wrapper đã sẵn sàng
+      window.parent?.postMessage({ type: "LUXE_SPOTIFY_READY" }, "*");
+    </script>
+  </body>
+</html>
