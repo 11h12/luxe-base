@@ -1,6 +1,59 @@
 # Luxe reverse-engineering handoff
 
-Updated: 2026-09-21 (handoff after version 2.5.16)
+Updated: 2026-09-22 (extension delivery workflow verified)
+
+## Required extension release workflow
+
+The unpacked Chrome extension is loaded from the repository root, **not** `dist/`.
+Vite writes its production build to `dist/`, so a successful `pnpm run build` alone
+does not update the extension that Chrome runs.
+
+For every extension release:
+
+1. Update the version in both root `manifest.json` and `public/manifest.json`.
+2. Run `pnpm run build`.
+3. Copy `dist/build.html` to root `newtab.html`.
+4. Copy the generated `dist/assets/*` files referenced by `newtab.html` into root
+   `assets/` (copy files, never the `assets` directory itself).
+5. Add explicit `!assets/<new-hashed-file>` exceptions to `.gitignore`; otherwise
+   the new bundle is silently omitted from the commit even though `newtab.html`
+   references it.
+6. Verify `newtab.html` references files that exist in root `assets/`, and confirm
+   the JS bundle contains a distinctive string from the intended change.
+7. Run `pnpm run build` and `git diff --check`, then commit source, manifests,
+   `newtab.html`, `.gitignore`, and the referenced JS/CSS assets together.
+8. Reload the unpacked extension from `chrome://extensions` and open a fresh New Tab.
+
+Do **not** clear `localStorage`/IndexedDB to refresh UI code: task, notes, and
+settings data live there. A new manifest version plus changed hashed asset names is
+the correct cache-busting mechanism. The current verified release is version
+`2.5.25`, commit `698b36e` (`fix: update task mini panel bundle`).
+
+## Commit practice
+
+- Inspect `git status --short` before staging; build assets are intentionally ignored
+  except for the exact pair referenced by root `newtab.html`.
+- Use `git diff --check` before committing, and include source and generated runtime
+  assets in one atomic commit so extension HTML never points at an uncommitted file.
+- Repository remote/branch: `origin` = `https://github.com/11h12/luxe-base.git`,
+  default working branch = `main`.
+- Standard release commands (run from repository root):
+
+  ```powershell
+  git status --short
+  git add .gitignore manifest.json public/manifest.json newtab.html src/components/TaskList.tsx assets/<new-js> assets/<new-css>
+  git diff --cached --check
+  git commit -m "fix: <concise release summary>"
+  git push origin main
+  git status --short
+  ```
+
+  Adjust the explicit source files and hashed asset names to the current release;
+  do not use `git add .` blindly. If Git cannot create `.git/index.lock` in the
+  sandbox, rerun the same Git command with the required workspace permission.
+- Push is an external write. Obtain or rely on explicit user approval to push the
+  specific commit to `origin/main`; never assume that a completed local commit also
+  authorizes a push. The `698b36e` commit is local and still awaiting such approval.
 
 ## User objective
 

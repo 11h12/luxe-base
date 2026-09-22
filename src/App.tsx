@@ -4,8 +4,8 @@ import { NotesPanel } from './components/NotesPanel'
 import { SettingsModal } from './components/SettingsModal'
 import { TaskList } from './components/TaskList'
 import { CalendarIcon, CloudIcon, FileTextIcon, FocusIcon, SlidersHorizontalIcon, SquareCheckBigIcon } from './components/Icons'
-import { getSettings, getTasks, seedMantras, seedQuotes, setSettings, setTasks } from './storage'
-import type { Settings, Task } from './types'
+import { getSettings, getTaskCollections, getTasks, seedMantras, seedQuotes, setSettings, setTaskCollections, setTasks } from './storage'
+import type { Settings, Task, TaskCollection } from './types'
 
 const sites = [
   ['▲', 'Vercel'], ['›', 'AdGuard Home'], ['N', 'The AI works...'], ['◖', 'GitHub'], ['›', 'Lark Base: AI...'], ['›', 'Create Next ...'],
@@ -26,6 +26,7 @@ function RoundButton({ children, label, onClick }: { children: React.ReactNode; 
 export function App() {
   const [settings, updateSettings] = useState<Settings>(getSettings)
   const [tasks, updateTasks] = useState<Task[]>(getTasks)
+  const [taskCollections, updateTaskCollections] = useState<TaskCollection[]>(getTaskCollections)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [tasksOpen, setTasksOpen] = useState(false)
   const [tasksExpanded, setTasksExpanded] = useState(false)
@@ -41,6 +42,7 @@ export function App() {
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
   useEffect(() => { setSettings(settings) }, [settings])
   useEffect(() => { setTasks(tasks) }, [tasks])
+  useEffect(() => { setTaskCollections(taskCollections) }, [taskCollections])
   useEffect(() => { setMantras(seedMantras(settings.locale)); setQuotes(seedQuotes(settings.locale)); setIndex(0); setQuoteIndex(0) }, [settings.locale])
   useEffect(() => { if (!settings.autoRotateMantras) return; const timer = window.setInterval(() => setIndex(value => value + 1), 30 * 60 * 1000); return () => clearInterval(timer) }, [settings.autoRotateMantras])
   useEffect(() => { if (!settings.autoRotateQuotes) return; const timer = window.setInterval(() => setQuoteIndex(value => value + 1), 30 * 60 * 1000); return () => clearInterval(timer) }, [settings.autoRotateQuotes])
@@ -69,7 +71,7 @@ export function App() {
     <button onClick={() => setQuoteIndex(value => value + 1)} title="Click để đổi quote" className="fixed bottom-7 left-1/2 z-20 w-[70vw] -translate-x-1/2 text-center text-[clamp(13px,1.25vw,22px)] font-semibold text-white drop-shadow-md transition hover:opacity-80">{quote}</button>
     <div className="fixed bottom-7 right-8 z-30 flex flex-col items-end gap-2"><span className="text-sm font-semibold">Tasks</span><div className="flex gap-3"><RoundButton label="Mở notes" onClick={() => setNotesOpen(value => !value)}><FileTextIcon className="size-5" /></RoundButton><RoundButton label={tasksOpen ? 'Đóng tasks' : 'Mở tasks'} onClick={() => setTasksOpen(value => { const next = !value; if (!next) setTasksExpanded(false); return next })}><SquareCheckBigIcon className="size-5" /></RoundButton></div></div>
     <NotesPanel open={notesOpen} onClose={() => setNotesOpen(false)}/>
-    {tasksOpen && <div className="fixed bottom-20 right-6 z-40"><TaskList tasks={tasks} showCompletedTasks={settings.showCompletedTasks} expanded={tasksExpanded} onChange={updateTasks} onToggleCompleted={toggleCompleted} onExpandedChange={setTasksExpanded}/></div>}
+    {tasksOpen && <div className="fixed bottom-20 right-6 z-40"><TaskList tasks={tasks} collections={taskCollections} showCompletedTasks={settings.showCompletedTasks} expanded={tasksExpanded} onChange={updateTasks} onCollectionsChange={updateTaskCollections} onToggleCompleted={toggleCompleted} onExpandedChange={setTasksExpanded}/></div>}
     <SettingsModal open={settingsOpen} settings={settings} onClose={() => setSettingsOpen(false)} onSettings={updateSettings} onLarkTasks={updateTasks}/>
   </main>
 }

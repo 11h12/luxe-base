@@ -14,3 +14,5 @@ button, input { font: inherit; }
 .luxe-glass-action:hover, .luxe-glass-action:focus-visible, button.luxe-glass-surface:hover, button.luxe-glass-surface:focus-visible { border-color: var(--luxe-glass-action-hover-border)!important; background-color: var(--luxe-glass-action-hover-background)!important; color: var(--luxe-glass-action-hover-foreground)!important; }
 .group:hover .luxe-glass-surface--action:not(.luxe-glass-surface--active), .group:focus-visible .luxe-glass-surface--action:not(.luxe-glass-surface--active), .luxe-glass-surface--action:not(.luxe-glass-surface--active):hover, .luxe-glass-surface--action:not(.luxe-glass-surface--active):focus-visible { border-color: var(--luxe-floating-glass-hover-border)!important; background-color: var(--luxe-floating-glass-hover-background)!important; color: var(--luxe-floating-glass-foreground)!important; }
 .luxe-note-surface { background-color: transparent; backdrop-filter: saturate(200%) blur(24px); }
+/* Notes and Tasks may stay open together: anchor the notes popover to the left. */
+.luxe-note-surface.fixed { left: 1.5rem; right: auto; }
