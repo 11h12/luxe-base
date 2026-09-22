@@ -7,10 +7,11 @@ export const getSettings = () => ({ ...defaults, ...read<Partial<Settings>>('lux
 export const setSettings = (value: Settings) => write('luxe_settings', value)
 export const getTasks = () => read<Task[]>('luxe_tasks', [])
 export const setTasks = (value: Task[]) => write('luxe_tasks', value)
-export const defaultTaskCollections: TaskCollection[] = [{ id: 'today', name: 'Today' }, { id: 'inbox', name: 'Inbox' }]
+export const defaultTaskCollections: TaskCollection[] = []
 export const getTaskCollections = () => {
   const collections = read<TaskCollection[]>('luxe_task_collections', defaultTaskCollections)
-  return collections.length ? collections : defaultTaskCollections
+  // Today, Upcoming, Inbox and Completed are system views, not editable custom lists.
+  return collections.filter(collection => collection.id !== 'today' && collection.id !== 'inbox')
 }
 export const setTaskCollections = (value: TaskCollection[]) => write('luxe_task_collections', value)
 // Recovered verbatim from legacy chunk 905c6fb5790f09a5.js, module 25860.
