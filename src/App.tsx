@@ -11,6 +11,11 @@ const sites = [
   ['▲', 'Vercel'], ['›', 'AdGuard Home'], ['N', 'The AI works...'], ['◖', 'GitHub'], ['›', 'Lark Base: AI...'], ['›', 'Create Next ...'],
 ]
 
+const greetings = {
+  vi: ['Chào buổi sáng', 'Chào buổi chiều', 'Chào buổi tối'],
+  en: ['Good morning', 'Good afternoon', 'Good evening'],
+} as const
+
 function TopSites() {
   return <section className="fixed right-10 top-1/2 z-20 hidden w-[222px] -translate-y-1/2 rounded-[26px] border border-white/10 bg-[#382b0dbd] px-4 py-4 text-white shadow-2xl backdrop-blur-xl xl:block">
     <header className="mb-4 flex items-center justify-between text-[11px] font-semibold tracking-wide text-white/45"><span>TOP SITES</span><span>⠿</span></header>
@@ -39,7 +44,7 @@ export function App() {
   const mantra = useMemo(() => mantras[index % Math.max(mantras.length, 1)] ?? '', [mantras, index])
   const quote = useMemo(() => quotes[quoteIndex % Math.max(quotes.length, 1)] ?? '', [quotes, quoteIndex])
   const hour = new Date().getHours()
-  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+  const greeting = greetings[settings.locale][hour < 12 ? 0 : hour < 18 ? 1 : 2]
   useEffect(() => { setSettings(settings) }, [settings])
   useEffect(() => { setTasks(tasks) }, [tasks])
   useEffect(() => { setTaskCollections(taskCollections) }, [taskCollections])

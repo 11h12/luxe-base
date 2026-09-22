@@ -7,4 +7,4 @@ dist/
 # Keep only the compiled extension assets referenced by newtab.html.
 assets/*
 !assets/build-CzdBaEzW.css
-!assets/build-j8Y0JeFd.js
+!assets/build-CRhi1APZ.js
