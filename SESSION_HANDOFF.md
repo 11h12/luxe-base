@@ -149,3 +149,10 @@ Reference screenshots were submitted in this conversation. Target visual charact
 - Note content is stored as a restricted safe HTML subset in `dbindex_notes`; unsafe tags and all HTML attributes are stripped before persistence. Open-note ids are persisted in `luxe_open_sticky_notes`.
 - Task title editing now mirrors `c7`: double-click the title/row to enter its inline input, press Enter or blur to save, or Escape to cancel. The task wrapper remains a `<p>` as required; completion is only the 22px status button.
 - Current root bundle for this pass: `assets/build-CSbNfWqf.js`; extension manifest version: **2.5.24**.
+
+## Repository checkpoint
+
+- This folder did not contain Git metadata or a configured remote when the checkpoint was requested.
+- A local Git repository was initialized on `main`; the initial, verified snapshot is commit `4406a09` (`feat: rebuild luxe new tab frontend`).
+- `.gitignore` excludes dependencies, Vite `dist/`, TypeScript build info, obsolete bundles, and the accidental `assets/assets/` duplicate directory. It keeps the two hashed files used by root `newtab.html`.
+- GitHub remote still needs the user's exact repository URL or an explicit choice to create a new public/private repository. The candidate inferred from Git identity, `https://github.com/11h12/luxe-base.git`, was checked read-only and was not found or was inaccessible; it was not added as a remote.
