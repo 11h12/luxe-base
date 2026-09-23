@@ -1,4 +1,4 @@
-import type { Settings, Task, TaskCollection } from './types'
+import type { FocusSession, Settings, Task, TaskCollection } from './types'
 export const DEFAULT_BACKGROUND_URL = 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2560&q=90'
 export const defaults: Settings = { locale: 'vi', showCompletedTasks: false, autoRotateMantras: true, autoRotateQuotes: true, backgroundUrl: DEFAULT_BACKGROUND_URL }
 export function read<T>(key: string, fallback: T): T { try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) as T : fallback } catch { return fallback } }
@@ -14,6 +14,8 @@ export const getTaskCollections = () => {
   return collections.filter(collection => collection.id !== 'today' && collection.id !== 'inbox')
 }
 export const setTaskCollections = (value: TaskCollection[]) => write('luxe_task_collections', value)
+export const getFocusSession = () => read<FocusSession | null>('luxe_focus_session', null)
+export const setFocusSession = (value: FocusSession | null) => write('luxe_focus_session', value)
 // Recovered verbatim from legacy chunk 905c6fb5790f09a5.js, module 25860.
 const defaultMantras = {
   vi: ['Tập trung vào việc quan trọng nhất trước.', 'Tiến bộ nhỏ mỗi ngày tạo nên thành quả lớn.', 'Giữ tỉnh thức, hít thở và tiếp tục tiến lên.', 'Làm ít lại, nhưng chất lượng hơn.', 'Hoàn thành tốt hơn hoàn hảo.', 'Hít vào bình an, thở ra muộn phiền.', 'Nghỉ ngơi cũng là một phần của tiến bộ.', 'Ý tưởng tốt nhất đến khi tâm trí tự do.', 'Hãy tử tế với chính mình hôm nay.', 'Mọi hành trình vạn dặm đều bắt đầu từ một bước chân.', 'Lắng nghe cơ thể bạn đang nói gì.', 'Đừng đợi cảm hứng, hãy bắt đầu ngay.', 'Sự bình yên bắt đầu từ bên trong.'],
