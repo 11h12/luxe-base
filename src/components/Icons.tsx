@@ -15,6 +15,8 @@ export function SquareCheckBigIcon(props: IconProps) { return <Icon {...props}><
 export function Maximize2Icon(props: IconProps) { return <Icon {...props}><path d="M15 3h6v6" /><path d="m21 3-7 7" /><path d="m3 21 7-7" /><path d="M9 21H3v-6" /></Icon> }
 export function Minimize2Icon(props: IconProps) { return <Icon {...props}><path d="m14 10 7-7" /><path d="M20 10h-6V4" /><path d="m3 21 7-7" /><path d="M4 14h6v6" /></Icon> }
 export function ChevronDownIcon(props: IconProps) { return <Icon {...props}><path d="m6 9 6 6 6-6" /></Icon> }
+export function ChevronLeftIcon(props: IconProps) { return <Icon {...props}><path d="m15 18-6-6 6-6" /></Icon> }
+export function ChevronRightIcon(props: IconProps) { return <Icon {...props}><path d="m9 18 6-6-6-6" /></Icon> }
 export function MoreHorizontalIcon(props: IconProps) { return <Icon {...props}><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" /></Icon> }
 export function CheckIcon(props: IconProps) { return <Icon {...props}><path d="m5 12 4 4L19 6" /></Icon> }
 export function CheckCheckIcon(props: IconProps) { return <Icon {...props}><path d="m3 12 4 4L14 6" /><path d="m10 12 4 4L21 6" /></Icon> }
