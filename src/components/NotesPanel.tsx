@@ -80,7 +80,19 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
   useEffect(() => { if (editorRef.current) editorRef.current.innerHTML = sanitizeNoteHtml(note.content) }, [note.id])
 
   const saveContent = () => onUpdate(note.id, { content: sanitizeNoteHtml(editorRef.current?.innerHTML ?? '') })
-  const runCommand = (command: string, value?: string) => { editorRef.current?.focus(); document.execCommand(command, false, value); saveContent(); setToolbarVersion(version => version + 1) }
+  const runCommand = (command: string, value?: string) => {
+    const editor = editorRef.current
+    if (!editor) return
+    const selection = document.getSelection()
+    const range = selection?.rangeCount ? selection.getRangeAt(0).cloneRange() : null
+    const rangeIsInsideEditor = Boolean(range && editor.contains(range.commonAncestorContainer))
+    const collapsed = Boolean(range?.collapsed)
+    editor.focus()
+    if (selection && range && rangeIsInsideEditor) { selection.removeAllRanges(); selection.addRange(range) }
+    document.execCommand(command, false, value)
+    if (!collapsed || !['bold', 'italic', 'underline', 'strikeThrough'].includes(command)) saveContent()
+    setToolbarVersion(version => version + 1)
+  }
   const clearFormatting = () => {
     const editor = editorRef.current
     if (!editor) return
@@ -111,11 +123,17 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
     const selectionNode = document.getSelection()?.anchorNode
     const selectionElement = selectionNode instanceof Element ? selectionNode : selectionNode?.parentElement
     const hasMark = (selector: string) => Boolean(selectionElement?.closest(selector) && editor.contains(selectionElement.closest(selector)))
+    const selection = document.getSelection()
     const inHeading = Boolean(selectionElement?.closest('h1, h2, h3, h4, h5, h6'))
-    if (key === 'bold') return hasMark('b, strong') || (!inHeading && document.queryCommandState('bold'))
-    if (key === 'italic') return hasMark('i, em') || document.queryCommandState('italic')
-    if (key === 'underline') return hasMark('u') || document.queryCommandState('underline')
-    if (key === 'strike') return hasMark('s, strike') || document.queryCommandState('strikeThrough')
+    const activeMark = (selector: string, command: string) => selection?.isCollapsed
+      ? document.queryCommandState(command)
+      : hasMark(selector) || document.queryCommandState(command)
+    if (key === 'bold') return inHeading && selection?.isCollapsed
+      ? hasMark('b, strong') && document.queryCommandState('bold')
+      : activeMark('b, strong', 'bold')
+    if (key === 'italic') return activeMark('i, em', 'italic')
+    if (key === 'underline') return activeMark('u', 'underline')
+    if (key === 'strike') return activeMark('s, strike', 'strikeThrough')
     if (key === 'bullet') return document.queryCommandState('insertUnorderedList')
     if (key === 'ordered') return document.queryCommandState('insertOrderedList')
     const block = document.queryCommandValue('formatBlock').replace(/[<>]/g, '').toLowerCase()
