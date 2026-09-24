@@ -26,7 +26,7 @@ function tasksFor(tasks: Task[], view: View, listId: string | null, showComplete
   const active = showCompleted || view === 'completed' ? tasks : tasks.filter(task => !task.done)
   if (view === 'today') return active.filter(task => sameToday(task.reminderAt) || (!task.reminderAt && task.listId === 'today'))
   if (view === 'upcoming') return active.filter(task => futureDay(task.reminderAt))
-  if (view === 'inbox') return active.filter(task => !task.reminderAt && task.listId !== 'today')
+  if (view === 'inbox') return active.filter(task => !task.reminderAt && !task.listId)
   if (view === 'completed') return tasks.filter(task => task.done)
   return active.filter(task => task.listId === listId)
 }
