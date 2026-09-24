@@ -77,6 +77,7 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
   const [collapsed, setCollapsed] = useState(false)
   const [toolbarVersion, setToolbarVersion] = useState(0)
   const inlineMarkStateRef = useRef<InlineMarkState | null>(null)
+  const savedSelectionRef = useRef<Range | null>(null)
   const palette = noteColors[note.color ?? 'mint']
   const isColor = note.theme === 'color'
 
@@ -118,16 +119,20 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
   const refreshSelectionToolbar = () => {
     const selection = document.getSelection()
     if (selection?.isCollapsed) inlineMarkStateRef.current = null
+    if (selection?.rangeCount && editorRef.current?.contains(selection.anchorNode)) savedSelectionRef.current = selection.getRangeAt(0).cloneRange()
     setToolbarVersion(version => version + 1)
   }
-  const handleBeforeInput = (event: React.FormEvent<HTMLDivElement>) => {
-    const input = event.nativeEvent as InputEvent
+  const rememberSelection = () => {
+    const editor = editorRef.current
+    const selection = document.getSelection()
+    if (editor && selection?.rangeCount && editor.contains(selection.anchorNode)) savedSelectionRef.current = selection.getRangeAt(0).cloneRange()
+  }
+  const insertTextWithMarks = (textValue: string) => {
     const editor = editorRef.current
     const selection = document.getSelection()
     const marks = inlineMarkStateRef.current
-    if (input.inputType !== 'insertText' || !input.data || !marks || !editor || !selection?.isCollapsed || !editor.contains(selection.anchorNode)) return
-    event.preventDefault()
-    const text = document.createTextNode(input.data)
+    if (!textValue || !marks || !editor || !selection?.isCollapsed || !editor.contains(selection.anchorNode)) return false
+    const text = document.createTextNode(textValue)
     const wrappers: Array<[InlineMark, string]> = [['bold', 'b'], ['italic', 'i'], ['underline', 'u'], ['strike', 's']]
     let content: Node = text
     wrappers.forEach(([key, tag]) => {
@@ -144,13 +149,28 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
     caret.collapse(true)
     selection.removeAllRanges()
     selection.addRange(caret)
+    savedSelectionRef.current = caret.cloneRange()
     saveContent()
+    setToolbarVersion(version => version + 1)
+    return true
+  }
+  const handleBeforeInput = (event: React.FormEvent<HTMLDivElement>) => {
+    const input = event.nativeEvent as InputEvent
+    if (input.inputType === 'insertText' && input.data && insertTextWithMarks(input.data)) event.preventDefault()
+  }
+  const handleEditorKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key.length !== 1 || event.ctrlKey || event.metaKey || event.altKey || !inlineMarkStateRef.current) return
+    if (insertTextWithMarks(event.key)) event.preventDefault()
   }
   const runCommand = (command: string, value?: string) => {
     const editor = editorRef.current
     if (!editor) return
     const selection = document.getSelection()
-    const range = selection?.rangeCount ? selection.getRangeAt(0).cloneRange() : null
+    const liveRange = selection?.rangeCount ? selection.getRangeAt(0) : null
+    const range = liveRange && editor.contains(liveRange.commonAncestorContainer)
+      ? liveRange.cloneRange()
+      : savedSelectionRef.current?.commonAncestorContainer && editor.contains(savedSelectionRef.current.commonAncestorContainer)
+        ? savedSelectionRef.current.cloneRange() : null
     const rangeIsInsideEditor = Boolean(range && editor.contains(range.commonAncestorContainer))
     const collapsed = Boolean(range?.collapsed)
     editor.focus()
@@ -283,7 +303,7 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
 
   return <section ref={frameRef} onMouseUp={rememberSize} className={`note-editor__window fixed z-50 min-h-[120px] min-w-[280px] max-w-[90vw] overflow-hidden rounded-[20px] border shadow-[0_24px_64px_rgba(0,0,0,.28)] ${isColor ? palette.note : 'border-white/35 bg-white/20 text-slate-900 backdrop-saturate-200 backdrop-blur-2xl'}`} style={{ left: position.x, top: position.y, width: note.size?.width ?? 420, height: collapsed ? 'auto' : note.size?.height ?? 520, resize: collapsed ? 'none' : 'both' }}>
     <header onPointerDown={startDrag} className="flex cursor-move items-center justify-between gap-2 px-4 py-3"><div className="flex min-w-0 flex-1 items-center gap-2 text-sm font-semibold"><GripHorizontalIcon className={`size-4 shrink-0 ${palette.toolbar}`} /><input value={note.title} onChange={event => onUpdate(note.id, { title: event.target.value })} placeholder="Untitled" className="w-full min-w-0 bg-transparent text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-500" /></div><div className="flex shrink-0 items-center gap-1"><button type="button" onClick={() => setCollapsed(value => !value)} className="inline-flex size-8 items-center justify-center rounded-full border border-slate-900/10 bg-white/35 text-slate-700 transition hover:bg-white/75" aria-label={collapsed ? 'Mở rộng note' : 'Thu gọn note'} title={collapsed ? 'Mở rộng note' : 'Thu gọn note'}>{collapsed ? <Maximize2Icon className="size-4" /> : <Minimize2Icon className="size-4" />}</button><button type="button" onClick={() => onUpdate(note.id, { theme: isColor ? 'blur' : 'color' })} className="inline-flex size-8 items-center justify-center rounded-full border border-slate-900/10 bg-white/35 text-slate-700 transition hover:bg-white/75" aria-label="Đổi nền note" title="Đổi nền note">{isColor ? <ToggleLeftIcon className="size-4" /> : <ToggleRightIcon className="size-4" />}</button>{isColor && <button type="button" onClick={() => onCycleColor(note.id)} className="inline-flex size-8 items-center justify-center rounded-full border border-slate-900/10 bg-white/35 text-slate-700 transition hover:bg-white/75" aria-label="Đổi màu note" title="Đổi màu note"><PaletteIcon className="size-4" /></button>}<button type="button" onClick={() => onDelete(note.id)} className="inline-flex size-8 items-center justify-center rounded-full border border-slate-900/10 bg-white/35 text-slate-700 transition hover:bg-white/75" aria-label="Xóa note" title="Xóa note"><TrashIcon className="size-4" /></button><button type="button" onClick={onClose} className="inline-flex size-8 items-center justify-center rounded-full border border-slate-900/10 bg-white/35 text-slate-700 transition hover:bg-white/75" aria-label="Đóng note" title="Đóng note"><XIcon className="size-4" /></button></div></header>
-    {!collapsed && <div className="h-[calc(100%-3.25rem)] px-4 pb-4"><div className="note-editor flex h-full flex-col overflow-hidden rounded-xl rounded-t-none border border-black/10 bg-white/60"><div role="toolbar" aria-label="Note formatting" className="flex flex-wrap items-center gap-1 border-b border-black/10 bg-white/80 px-2 py-2">{controls.map(([key, glyph, label, onClick]) => <button key={key} type="button" onMouseDown={event => event.preventDefault()} onClick={onClick} className={`inline-flex h-7 min-w-[28px] shrink-0 items-center justify-center rounded-md border px-2 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 ${isActive(key) ? 'border-slate-900 bg-slate-900 text-white shadow-md ring-2 ring-sky-500/80' : 'border-slate-400/70 bg-white/75 text-slate-800 hover:bg-white'}`} aria-label={label} title={label} aria-pressed={isActive(key)}>{glyph}</button>)}</div><div ref={editorRef} contentEditable suppressContentEditableWarning onBeforeInput={handleBeforeInput} onInput={saveContent} onKeyUp={event => { if (event.key.startsWith('Arrow') || ['Home', 'End', 'PageUp', 'PageDown'].includes(event.key)) refreshCaretMarkState(); else setToolbarVersion(version => version + 1) }} onMouseUp={refreshSelectionToolbar} className="note-editor__content min-h-[220px] flex-1 overflow-auto px-3 py-2 text-sm text-slate-900 outline-none" /></div></div>}
+    {!collapsed && <div className="h-[calc(100%-3.25rem)] px-4 pb-4"><div className="note-editor flex h-full flex-col overflow-hidden rounded-xl rounded-t-none border border-black/10 bg-white/60"><div role="toolbar" aria-label="Note formatting" className="flex flex-wrap items-center gap-1 border-b border-black/10 bg-white/80 px-2 py-2">{controls.map(([key, glyph, label, onClick]) => <button key={key} type="button" onMouseDown={event => event.preventDefault()} onClick={onClick} className={`inline-flex h-7 min-w-[28px] shrink-0 items-center justify-center rounded-md border px-2 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 ${isActive(key) ? 'border-slate-900 bg-slate-900 text-white shadow-md ring-2 ring-sky-500/80' : 'border-slate-400/70 bg-white/75 text-slate-800 hover:bg-white'}`} aria-label={label} title={label} aria-pressed={isActive(key)}>{glyph}</button>)}</div><div ref={editorRef} contentEditable suppressContentEditableWarning onBeforeInput={handleBeforeInput} onKeyDown={handleEditorKeyDown} onInput={saveContent} onKeyUp={event => { rememberSelection(); if (event.key.startsWith('Arrow') || ['Home', 'End', 'PageUp', 'PageDown'].includes(event.key)) refreshCaretMarkState(); else setToolbarVersion(version => version + 1) }} onMouseUp={refreshSelectionToolbar} className="note-editor__content min-h-[220px] flex-1 overflow-auto px-3 py-2 text-sm text-slate-900 outline-none" /></div></div>}
   </section>
 }
 
