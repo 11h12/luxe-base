@@ -89,8 +89,37 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
     const collapsed = Boolean(range?.collapsed)
     editor.focus()
     if (selection && range && rangeIsInsideEditor) { selection.removeAllRanges(); selection.addRange(range) }
+    const inlineMark = command === 'bold' ? 'b, strong'
+      : command === 'italic' ? 'i, em'
+      : command === 'underline' ? 'u'
+      : command === 'strikeThrough' ? 's, strike' : null
+    const anchor = selection?.anchorNode
+    const anchorElement = anchor instanceof Element ? anchor : anchor?.parentElement
+    const activeBefore = Boolean(inlineMark && (anchorElement?.closest(inlineMark) || document.queryCommandState(command)))
     document.execCommand(command, false, value)
-    if (!collapsed || !['bold', 'italic', 'underline', 'strikeThrough'].includes(command)) saveContent()
+    // Some contentEditable engines leave the caret inside the old mark after
+    // execCommand toggles it off. Split that mark at the caret so subsequent
+    // typing is genuinely unformatted while preserving the preceding text.
+    let splitInlineMark = false
+    if (collapsed && activeBefore && inlineMark && selection?.isCollapsed) {
+      const currentAnchor = selection.anchorNode
+      const currentElement = currentAnchor instanceof Element ? currentAnchor : currentAnchor?.parentElement
+      const mark = currentElement?.closest(inlineMark) as HTMLElement | null | undefined
+      if (mark && mark.contains(selection.anchorNode) && editor.contains(mark) && mark.parentNode) {
+        const split = document.createRange()
+        split.setStart(selection.anchorNode!, selection.anchorOffset)
+        split.setEnd(mark, mark.childNodes.length)
+        const trailing = split.extractContents()
+        mark.after(trailing)
+        const caret = document.createRange()
+        caret.setStartAfter(mark)
+        caret.collapse(true)
+        selection.removeAllRanges()
+        selection.addRange(caret)
+        splitInlineMark = true
+      }
+    }
+    if (!collapsed || splitInlineMark || !['bold', 'italic', 'underline', 'strikeThrough'].includes(command)) saveContent()
     setToolbarVersion(version => version + 1)
   }
   const clearFormatting = () => {
