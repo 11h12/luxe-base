@@ -33,6 +33,16 @@ export function ToggleLeftIcon(props: IconProps) { return <Icon {...props}><circ
 export function ToggleRightIcon(props: IconProps) { return <Icon {...props}><circle cx="15" cy="12" r="3" /><rect width="20" height="14" x="2" y="5" rx="7" /></Icon> }
 export function TrashIcon(props: IconProps) { return <Icon {...props}><path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></Icon> }
 export function FileTextIcon(props: IconProps) { return <Icon {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z" /><path d="M14 2v6h6" /><path d="M8 13h8" /><path d="M8 17h8" /></Icon> }
+export function BoldIcon(props: IconProps) { return <Icon {...props}><path d="M6 4h8a4 4 0 0 1 0 8H6z" /><path d="M6 12h9a4 4 0 0 1 0 8H6z" /></Icon> }
+export function ItalicIcon(props: IconProps) { return <Icon {...props}><path d="M19 4h-9" /><path d="M14 20H5" /><path d="m15 4-6 16" /></Icon> }
+export function UnderlineIcon(props: IconProps) { return <Icon {...props}><path d="M6 4v7a6 6 0 0 0 12 0V4" /><path d="M4 20h16" /></Icon> }
+export function StrikethroughIcon(props: IconProps) { return <Icon {...props}><path d="M16 4H9a4 4 0 0 0-3.5 6" /><path d="M4 12h16" /><path d="M5.5 18A4 4 0 0 0 9 20h7" /></Icon> }
+export function Heading2Icon(props: IconProps) { return <Icon {...props}><path d="M4 5v14" /><path d="M12 5v14" /><path d="M4 12h8" /><path d="M21 15a2.5 2.5 0 0 0-5 0c0 2.5 5 2 5 5h-5" /></Icon> }
+export function ListIcon(props: IconProps) { return <Icon {...props}><path d="M9 6h12" /><path d="M9 12h12" /><path d="M9 18h12" /><path d="M4 6h.01" /><path d="M4 12h.01" /><path d="M4 18h.01" /></Icon> }
+export function ListOrderedIcon(props: IconProps) { return <Icon {...props}><path d="M10 6h11" /><path d="M10 12h11" /><path d="M10 18h11" /><path d="M4 6h1v4" /><path d="M4 10h2" /><path d="M6 18H4c0-1 2-1.5 2-3a1 1 0 0 0-2 0" /></Icon> }
+export function QuoteIcon(props: IconProps) { return <Icon {...props}><path d="M3 21c3 0 7-2 7-9V5H3v7h4c0 3-1 5-4 6z" /><path d="M14 21c3 0 7-2 7-9V5h-7v7h4c0 3-1 5-4 6z" /></Icon> }
+export function CodeIcon(props: IconProps) { return <Icon {...props}><path d="m16 18 6-6-6-6" /><path d="m8 6-6 6 6 6" /><path d="m14 4-4 16" /></Icon> }
+export function RemoveFormatIcon(props: IconProps) { return <Icon {...props}><path d="M4 7V4h16v3" /><path d="M9 20h6" /><path d="m12 4 0 9" /><path d="m4 4 16 16" /></Icon> }
 export function SlidersHorizontalIcon(props: IconProps) { return <Icon {...props}><line x1="21" x2="14" y1="4" y2="4" /><line x1="10" x2="3" y1="4" y2="4" /><line x1="21" x2="12" y1="12" y2="12" /><line x1="8" x2="3" y1="12" y2="12" /><line x1="21" x2="16" y1="20" y2="20" /><line x1="12" x2="3" y1="20" y2="20" /><line x1="14" x2="14" y1="2" y2="6" /><line x1="8" x2="8" y1="10" y2="14" /><line x1="16" x2="16" y1="18" y2="22" /></Icon> }
 export function CalendarIcon(props: IconProps) { return <Icon {...props}><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /></Icon> }
 export function CalendarClockIcon(props: IconProps) { return <Icon {...props}><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /><circle cx="12" cy="16" r="3" /><path d="M12 14.5V16l1 1" /></Icon> }
