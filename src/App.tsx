@@ -3,7 +3,7 @@ import { Clock } from './components/Clock'
 import { NotesPanel } from './components/NotesPanel'
 import { SettingsModal } from './components/SettingsModal'
 import { TaskList } from './components/TaskList'
-import { CalendarIcon, CloudIcon, FileTextIcon, FocusIcon, SlidersHorizontalIcon, SquareCheckBigIcon } from './components/Icons'
+import { CalendarIcon, CloudIcon, FocusIcon, SlidersHorizontalIcon, SquareCheckBigIcon } from './components/Icons'
 import { getFocusSession, getSettings, getTaskCollections, getTasks, seedMantras, seedQuotes, setFocusSession, setSettings, setTaskCollections, setTasks } from './storage'
 import type { FocusSession, Settings, Task, TaskCollection } from './types'
 
@@ -91,10 +91,10 @@ export function App() {
       {dailyGoalTasks.length > 0 && <div className="mt-5 flex max-w-[min(88vw,960px)] flex-wrap justify-center gap-2">{dailyGoalTasks.map(task => <button key={task.id} type="button" onClick={() => { setTasksOpen(true); setTasksExpanded(true) }} className="rounded-full border border-white/20 bg-black/20 px-4 py-2 text-sm font-semibold text-white/85 backdrop-blur transition hover:bg-black/35"><span className="mr-2 text-white/50">Daily goal</span>{task.title}</button>)}</div>}
       <button onClick={() => setIndex(value => value + 1)} title="Click để đổi mantra" style={{ fontSize: 'clamp(22px, 2.6vw, 42px)' }} className="mt-7 max-w-[min(88vw,1200px)] cursor-pointer font-semibold leading-tight text-white drop-shadow-[0_4px_18px_rgba(0,0,0,.3)] transition hover:opacity-80">{mantra}</button>
     </section>
-    <button onClick={() => setSettingsOpen(true)} className="luxe-glass-action fixed bottom-6 left-6 z-30 flex size-10 items-center justify-center rounded-full text-white/85" aria-label="Mở cài đặt"><SlidersHorizontalIcon className="size-5" /></button>
+    <button onClick={() => setSettingsOpen(true)} className="luxe-glass-action fixed bottom-6 left-20 z-30 flex size-10 items-center justify-center rounded-full text-white/85" aria-label="Mở cài đặt"><SlidersHorizontalIcon className="size-5" /></button>
     <button onClick={() => setQuoteIndex(value => value + 1)} title="Click để đổi quote" className="fixed bottom-7 left-1/2 z-20 w-[70vw] -translate-x-1/2 text-center text-[clamp(13px,1.25vw,22px)] font-semibold text-white drop-shadow-md transition hover:opacity-80">{quote}</button>
-    <div className="fixed bottom-7 right-8 z-30 flex flex-col items-end gap-2"><span className="text-sm font-semibold">Tasks</span><div className="flex gap-3"><RoundButton label="Mở notes" onClick={() => setNotesOpen(value => !value)}><FileTextIcon className="size-5" /></RoundButton><RoundButton label={tasksOpen ? 'Đóng tasks' : 'Mở tasks'} onClick={() => setTasksOpen(value => { const next = !value; if (!next) setTasksExpanded(false); return next })}><SquareCheckBigIcon className="size-5" /></RoundButton></div></div>
-    <NotesPanel open={notesOpen} onClose={() => setNotesOpen(false)}/>
+    <div className="fixed bottom-7 right-8 z-30 flex flex-col items-end gap-2"><span className="text-sm font-semibold">Tasks</span><div className="flex gap-3"><RoundButton label={tasksOpen ? 'Đóng tasks' : 'Mở tasks'} onClick={() => setTasksOpen(value => { const next = !value; if (!next) setTasksExpanded(false); return next })}><SquareCheckBigIcon className="size-5" /></RoundButton></div></div>
+    <NotesPanel open={notesOpen} onToggle={() => setNotesOpen(value => !value)} onClose={() => setNotesOpen(false)}/>
     {tasksOpen && <div className="fixed bottom-20 right-6 z-40"><TaskList tasks={tasks} collections={taskCollections} showCompletedTasks={settings.showCompletedTasks} expanded={tasksExpanded} dailyGoalTaskIds={dailyGoalTasks.map(task => task.id)} onChange={updateTasks} onCollectionsChange={updateTaskCollections} onToggleCompleted={toggleCompleted} onStartFocus={startFocus} onSetDailyGoal={setTaskDailyGoal} onExpandedChange={setTasksExpanded}/></div>}
     <SettingsModal open={settingsOpen} settings={settings} onClose={() => setSettingsOpen(false)} onSettings={updateSettings} onLarkTasks={updateTasks}/>
     {focusOpen && focusedTask && <FocusModeOverlay task={focusedTask} session={focusSession!} onEnd={endFocus} />}
