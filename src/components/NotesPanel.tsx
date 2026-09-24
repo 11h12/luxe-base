@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BoldIcon, CodeIcon, GripHorizontalIcon, Heading2Icon, ItalicIcon, ListIcon, ListOrderedIcon, Maximize2Icon, Minimize2Icon, PaletteIcon, PlusIcon, QuoteIcon, RemoveFormatIcon, SearchIcon, StrikethroughIcon, ToggleLeftIcon, ToggleRightIcon, TrashIcon, UnderlineIcon, XIcon } from './Icons'
+import { GripHorizontalIcon, Maximize2Icon, Minimize2Icon, PaletteIcon, PlusIcon, SearchIcon, ToggleLeftIcon, ToggleRightIcon, TrashIcon, XIcon } from './Icons'
 
 type NoteColor = 'mint' | 'blush' | 'stone' | 'sky' | 'amber'
 type NoteTheme = 'blur' | 'color'
@@ -72,7 +72,7 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
   const editorRef = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState(() => note.position ?? defaultPosition(0))
   const [collapsed, setCollapsed] = useState(false)
-  const [, setToolbarVersion] = useState(0)
+  const [toolbarVersion, setToolbarVersion] = useState(0)
   const palette = noteColors[note.color ?? 'mint']
   const isColor = note.theme === 'color'
 
@@ -80,6 +80,20 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
 
   const saveContent = () => onUpdate(note.id, { content: sanitizeNoteHtml(editorRef.current?.innerHTML ?? '') })
   const runCommand = (command: string, value?: string) => { editorRef.current?.focus(); document.execCommand(command, false, value); saveContent(); setToolbarVersion(version => version + 1) }
+  const isActive = (key: string) => {
+    // Read toolbarVersion so selection changes refresh the active button styling.
+    void toolbarVersion
+    const editor = editorRef.current
+    if (!editor || !editor.contains(document.getSelection()?.anchorNode ?? null)) return false
+    if (key === 'bold') return document.queryCommandState('bold')
+    if (key === 'italic') return document.queryCommandState('italic')
+    if (key === 'underline') return document.queryCommandState('underline')
+    if (key === 'strike') return document.queryCommandState('strikeThrough')
+    if (key === 'bullet') return document.queryCommandState('insertUnorderedList')
+    if (key === 'ordered') return document.queryCommandState('insertOrderedList')
+    const block = document.queryCommandValue('formatBlock').replace(/[<>]/g, '').toLowerCase()
+    return key === 'h2' ? block === 'h2' : key === 'quote' ? block === 'blockquote' : key === 'code' ? block === 'pre' : false
+  }
   const startDrag = (event: React.PointerEvent<HTMLElement>) => {
     if ((event.target as HTMLElement).closest('button, input')) return
     const origin = position
@@ -97,21 +111,21 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
     if (size.width !== note.size?.width || size.height !== note.size?.height) onUpdate(note.id, { size })
   }
   const controls = [
-    ['bold', 'Bold', <BoldIcon className="size-4" />, () => runCommand('bold')],
-    ['italic', 'Italic', <ItalicIcon className="size-4" />, () => runCommand('italic')],
-    ['underline', 'Underline', <UnderlineIcon className="size-4" />, () => runCommand('underline')],
-    ['strike', 'Strikethrough', <StrikethroughIcon className="size-4" />, () => runCommand('strikeThrough')],
-    ['h2', 'Heading 2', <Heading2Icon className="size-4" />, () => runCommand('formatBlock', 'H2')],
-    ['bullet', 'Bulleted list', <ListIcon className="size-4" />, () => runCommand('insertUnorderedList')],
-    ['ordered', 'Numbered list', <ListOrderedIcon className="size-4" />, () => runCommand('insertOrderedList')],
-    ['quote', 'Block quote', <QuoteIcon className="size-4" />, () => runCommand('formatBlock', 'BLOCKQUOTE')],
-    ['code', 'Code block', <CodeIcon className="size-4" />, () => runCommand('formatBlock', 'PRE')],
-    ['clear', 'Clear formatting', <RemoveFormatIcon className="size-4" />, () => { runCommand('removeFormat'); runCommand('formatBlock', 'DIV') }],
+    ['bold', 'B', 'Bold', () => runCommand('bold')],
+    ['italic', 'I', 'Italic', () => runCommand('italic')],
+    ['underline', 'U', 'Underline', () => runCommand('underline')],
+    ['strike', 'S', 'Strikethrough', () => runCommand('strikeThrough')],
+    ['h2', 'H2', 'Heading 2', () => runCommand('formatBlock', 'H2')],
+    ['bullet', '•', 'Bulleted list', () => runCommand('insertUnorderedList')],
+    ['ordered', '1.', 'Numbered list', () => runCommand('insertOrderedList')],
+    ['quote', '“', 'Block quote', () => runCommand('formatBlock', 'BLOCKQUOTE')],
+    ['code', '</>', 'Code block', () => runCommand('formatBlock', 'PRE')],
+    ['clear', '⌫', 'Clear formatting', () => { runCommand('removeFormat'); runCommand('formatBlock', 'DIV') }],
   ] as const
 
   return <section ref={frameRef} onMouseUp={rememberSize} className={`fixed z-50 min-h-[120px] min-w-[280px] max-w-[90vw] overflow-hidden rounded-[20px] border shadow-[0_24px_64px_rgba(0,0,0,.28)] ${isColor ? palette.note : 'border-white/35 bg-white/20 text-slate-900 backdrop-saturate-200 backdrop-blur-2xl'}`} style={{ left: position.x, top: position.y, width: note.size?.width ?? 420, height: collapsed ? 'auto' : note.size?.height ?? 520, resize: collapsed ? 'none' : 'both' }}>
     <header onPointerDown={startDrag} className="flex cursor-move items-center justify-between gap-2 px-4 py-3"><div className="flex min-w-0 flex-1 items-center gap-2 text-sm font-semibold"><GripHorizontalIcon className={`size-4 shrink-0 ${palette.toolbar}`} /><input value={note.title} onChange={event => onUpdate(note.id, { title: event.target.value })} placeholder="Untitled" className="w-full min-w-0 bg-transparent text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-500" /></div><div className="flex shrink-0 items-center gap-1"><button type="button" onClick={() => setCollapsed(value => !value)} className="inline-flex size-8 items-center justify-center rounded-full border border-slate-900/10 bg-white/35 text-slate-700 transition hover:bg-white/75" aria-label={collapsed ? 'Mở rộng note' : 'Thu gọn note'} title={collapsed ? 'Mở rộng note' : 'Thu gọn note'}>{collapsed ? <Maximize2Icon className="size-4" /> : <Minimize2Icon className="size-4" />}</button><button type="button" onClick={() => onUpdate(note.id, { theme: isColor ? 'blur' : 'color' })} className="inline-flex size-8 items-center justify-center rounded-full border border-slate-900/10 bg-white/35 text-slate-700 transition hover:bg-white/75" aria-label="Đổi nền note" title="Đổi nền note">{isColor ? <ToggleLeftIcon className="size-4" /> : <ToggleRightIcon className="size-4" />}</button>{isColor && <button type="button" onClick={() => onCycleColor(note.id)} className="inline-flex size-8 items-center justify-center rounded-full border border-slate-900/10 bg-white/35 text-slate-700 transition hover:bg-white/75" aria-label="Đổi màu note" title="Đổi màu note"><PaletteIcon className="size-4" /></button>}<button type="button" onClick={() => onDelete(note.id)} className="inline-flex size-8 items-center justify-center rounded-full border border-slate-900/10 bg-white/35 text-slate-700 transition hover:bg-white/75" aria-label="Xóa note" title="Xóa note"><TrashIcon className="size-4" /></button><button type="button" onClick={onClose} className="inline-flex size-8 items-center justify-center rounded-full border border-slate-900/10 bg-white/35 text-slate-700 transition hover:bg-white/75" aria-label="Đóng note" title="Đóng note"><XIcon className="size-4" /></button></div></header>
-    {!collapsed && <div className="h-[calc(100%-3.25rem)] px-4 pb-4"><div className="note-editor flex h-full flex-col overflow-hidden rounded-[16px] rounded-t-none border border-white/35 bg-white/15 backdrop-blur-xl"><div role="toolbar" aria-label="Note formatting" className="flex flex-wrap items-center gap-1 border-b border-white/35 bg-white/25 px-2 py-2">{controls.map(([key, label, icon, onClick]) => <button key={key} type="button" onMouseDown={event => event.preventDefault()} onClick={onClick} className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-slate-900/10 bg-white/35 text-slate-700 transition hover:bg-white/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700/25" aria-label={label} title={label}>{icon}</button>)}</div><div ref={editorRef} contentEditable suppressContentEditableWarning onInput={saveContent} onKeyUp={() => setToolbarVersion(version => version + 1)} onMouseUp={() => setToolbarVersion(version => version + 1)} className="note-editor__content min-h-[220px] flex-1 overflow-auto px-4 py-3 text-sm text-slate-900 outline-none" /></div></div>}
+    {!collapsed && <div className="h-[calc(100%-3.25rem)] px-4 pb-4"><div className="note-editor flex h-full flex-col overflow-hidden rounded-xl rounded-t-none border border-black/10 bg-white/60"><div role="toolbar" aria-label="Note formatting" className="flex flex-wrap items-center gap-1 border-b border-black/10 bg-white/60 px-2 py-2">{controls.map(([key, glyph, label, onClick]) => <button key={key} type="button" onMouseDown={event => event.preventDefault()} onClick={onClick} className={`inline-flex h-7 min-w-[28px] shrink-0 items-center justify-center rounded-md border border-black/10 px-2 text-xs font-semibold text-slate-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700/25 ${isActive(key) ? 'bg-white shadow-sm' : 'bg-white/30 hover:bg-white/70'}`} aria-label={label} title={label} aria-pressed={isActive(key)}>{glyph}</button>)}</div><div ref={editorRef} contentEditable suppressContentEditableWarning onInput={saveContent} onKeyUp={() => setToolbarVersion(version => version + 1)} onMouseUp={() => setToolbarVersion(version => version + 1)} className="note-editor__content min-h-[220px] flex-1 overflow-auto px-3 py-2 text-sm text-slate-900 outline-none" /></div></div>}
   </section>
 }
 
