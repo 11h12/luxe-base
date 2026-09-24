@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { FileTextIcon, GripHorizontalIcon, Maximize2Icon, Minimize2Icon, PaletteIcon, PlusIcon, SearchIcon, ToggleLeftIcon, ToggleRightIcon, TrashIcon, XIcon } from './Icons'
+import { FileIcon, GripHorizontalIcon, Maximize2Icon, Minimize2Icon, PaletteIcon, PlusIcon, SearchIcon, ToggleLeftIcon, ToggleRightIcon, TrashIcon, XIcon } from './Icons'
 
 type NoteColor = 'mint' | 'blush' | 'stone' | 'sky' | 'amber'
 type NoteTheme = 'blur' | 'color'
@@ -80,6 +80,28 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
 
   const saveContent = () => onUpdate(note.id, { content: sanitizeNoteHtml(editorRef.current?.innerHTML ?? '') })
   const runCommand = (command: string, value?: string) => { editorRef.current?.focus(); document.execCommand(command, false, value); saveContent(); setToolbarVersion(version => version + 1) }
+  const clearFormatting = () => {
+    const editor = editorRef.current
+    if (!editor) return
+    editor.focus()
+    editor.querySelectorAll('h2, blockquote, pre').forEach(element => {
+      const paragraph = document.createElement('div')
+      while (element.firstChild) paragraph.appendChild(element.firstChild)
+      element.replaceWith(paragraph)
+    })
+    editor.querySelectorAll('ul, ol').forEach(list => {
+      const lines = document.createDocumentFragment()
+      Array.from(list.children).forEach(item => {
+        const line = document.createElement('div')
+        while (item.firstChild) line.appendChild(item.firstChild)
+        lines.appendChild(line)
+      })
+      list.replaceWith(lines)
+    })
+    editor.querySelectorAll('b, strong, i, em, u, s, strike, code').forEach(element => element.replaceWith(...Array.from(element.childNodes)))
+    saveContent()
+    setToolbarVersion(version => version + 1)
+  }
   const isActive = (key: string) => {
     // Read toolbarVersion so selection changes refresh the active button styling.
     void toolbarVersion
@@ -120,7 +142,7 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
     ['ordered', '1.', 'Numbered list', () => runCommand('insertOrderedList')],
     ['quote', '“', 'Block quote', () => runCommand('formatBlock', 'BLOCKQUOTE')],
     ['code', '</>', 'Code block', () => runCommand('formatBlock', 'PRE')],
-    ['clear', '⌫', 'Clear formatting', () => { runCommand('removeFormat'); runCommand('formatBlock', 'DIV') }],
+    ['clear', '⌫', 'Clear formatting', clearFormatting],
   ] as const
 
   return <section ref={frameRef} onMouseUp={rememberSize} className={`note-editor__window fixed z-50 min-h-[120px] min-w-[280px] max-w-[90vw] overflow-hidden rounded-[20px] border shadow-[0_24px_64px_rgba(0,0,0,.28)] ${isColor ? palette.note : 'border-white/35 bg-white/20 text-slate-900 backdrop-saturate-200 backdrop-blur-2xl'}`} style={{ left: position.x, top: position.y, width: note.size?.width ?? 420, height: collapsed ? 'auto' : note.size?.height ?? 520, resize: collapsed ? 'none' : 'both' }}>
@@ -143,5 +165,5 @@ export function NotesPanel({ open, onClose, onToggle }: Props) {
   const deleteNote = (id: string) => { persist(notes.filter(note => note.id !== id)); closeEditor(id) }
   const cycleColor = (id: string) => { const note = notes.find(item => item.id === id); if (!note) return; const current = colorOrder.indexOf(note.color ?? 'mint'); update(id, { color: colorOrder[(current + 1) % colorOrder.length] }) }
 
-  return <><button type="button" onClick={onToggle} className="luxe-glass-surface luxe-glass-surface--action fixed bottom-6 left-6 z-30 flex size-11 items-center justify-center rounded-full text-white/90 shadow-sm transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60" aria-label={open ? 'Đóng notes' : 'Mở notes'} title="Notes"><FileTextIcon className="size-5" />{notes.length > 0 && <span className="absolute -right-1.5 -top-1.5 rounded-full bg-white/90 px-1.5 py-0.5 text-[10px] font-semibold text-slate-900">{notes.length}</span>}</button>{open && <section className="luxe-note-surface fixed bottom-20 right-6 z-40 w-[320px] max-w-[calc(100vw-3rem)] rounded-[20px] border border-white/15 text-white shadow-[0_24px_60px_-30px_rgba(0,0,0,.7)]"><header className="flex items-center justify-between border-b border-white/10 px-4 py-3"><div className="flex items-center gap-2"><h3 className="text-sm font-semibold">My Notes</h3><span className="luxe-glass-surface rounded-full px-2 py-0.5 text-xs text-white/70">{visible.length}</span></div><div className="flex items-center gap-1"><button type="button" onClick={create} className="notes-panel-action luxe-glass-surface inline-flex size-8 items-center justify-center rounded-full text-white/80 transition hover:bg-black/10" aria-label="Tạo note"><PlusIcon className="size-4" /></button><button type="button" onClick={onClose} className="notes-panel-action luxe-glass-surface inline-flex size-8 items-center justify-center rounded-full text-white/70 transition hover:bg-black/10" aria-label="Đóng notes"><XIcon className="size-4" /></button></div></header><div className="mx-3 mt-3 flex items-center gap-2 rounded-xl border border-white/10 bg-black/10 px-3 py-2"><SearchIcon className="size-4 shrink-0 text-white/45" /><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search notes..." className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/40" /></div><div className="max-h-[60vh] space-y-3 overflow-y-auto p-3">{visible.map((note, index) => <button key={note.id} type="button" onClick={() => openEditor(note.id)} className={`w-full rounded-[16px] border px-3 py-2 text-left transition ${noteColors[note.color ?? colorOrder[index % colorOrder.length]].panel} ${openNoteIds.includes(note.id) ? 'ring-2 ring-white/70' : 'hover:ring-2 hover:ring-white/30'}`}><h4 className="text-sm font-semibold">{note.title || 'Untitled'}</h4><p className="mt-1 max-h-12 overflow-hidden text-xs opacity-80">{plainText(note.content) || 'No content yet'}</p><p className="mt-2 text-[11px] opacity-70">{new Date(note.updatedAt).toLocaleString(undefined, { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}</p></button>)}{!visible.length && <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-6 text-center text-sm text-white/70">{notes.length ? 'No matching notes.' : 'Create your first note.'}</div>}</div></section>}{openNotes.map(note => <NoteEditor key={note.id} note={note} onClose={() => closeEditor(note.id)} onUpdate={update} onDelete={deleteNote} onCycleColor={cycleColor} />)}</>
+  return <><button type="button" onClick={onToggle} className="luxe-glass-surface luxe-glass-surface--action fixed bottom-6 left-6 z-30 flex size-11 items-center justify-center rounded-full text-white/90 shadow-sm transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60" aria-label={open ? 'Đóng notes' : 'Mở notes'} title="Notes"><FileIcon className="size-5" />{notes.length > 0 && <span className="absolute -right-1.5 -top-1.5 z-10 rounded-full bg-white px-1.5 py-0.5 text-[10px] font-semibold text-slate-900 ring-2 ring-white/50 shadow-[0_0_12px_rgba(255,255,255,.65)]">{notes.length}</span>}</button>{open && <section className="luxe-note-surface fixed bottom-20 right-6 z-40 w-[320px] max-w-[calc(100vw-3rem)] rounded-[20px] border border-white/15 text-white shadow-[0_24px_60px_-30px_rgba(0,0,0,.7)]"><header className="flex items-center justify-between border-b border-white/10 px-4 py-3"><div className="flex items-center gap-2"><h3 className="text-sm font-semibold">My Notes</h3><span className="luxe-glass-surface rounded-full px-2 py-0.5 text-xs text-white/70">{visible.length}</span></div><div className="flex items-center gap-1"><button type="button" onClick={create} className="notes-panel-action luxe-glass-surface inline-flex size-8 items-center justify-center rounded-full text-white/90 transition" aria-label="Tạo note"><PlusIcon className="size-4" /></button><button type="button" onClick={onClose} className="notes-panel-action luxe-glass-surface inline-flex size-8 items-center justify-center rounded-full text-white/90 transition" aria-label="Đóng notes"><XIcon className="size-4" /></button></div></header><div className="mx-3 mt-3 flex items-center gap-2 rounded-xl border border-white/10 bg-black/10 px-3 py-2"><SearchIcon className="size-4 shrink-0 text-white/45" /><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search notes..." className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/40" /></div><div className="max-h-[60vh] space-y-3 overflow-y-auto p-3">{visible.map((note, index) => <button key={note.id} type="button" onClick={() => openEditor(note.id)} className={`w-full rounded-[16px] border px-3 py-2 text-left transition ${noteColors[note.color ?? colorOrder[index % colorOrder.length]].panel} ${openNoteIds.includes(note.id) ? 'ring-2 ring-white/70' : 'hover:ring-2 hover:ring-white/30'}`}><h4 className="text-sm font-semibold">{note.title || 'Untitled'}</h4><p className="mt-1 max-h-12 overflow-hidden text-xs opacity-80">{plainText(note.content) || 'No content yet'}</p><p className="mt-2 text-[11px] opacity-70">{new Date(note.updatedAt).toLocaleString(undefined, { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}</p></button>)}{!visible.length && <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-6 text-center text-sm text-white/70">{notes.length ? 'No matching notes.' : 'Create your first note.'}</div>}</div></section>}{openNotes.map(note => <NoteEditor key={note.id} note={note} onClose={() => closeEditor(note.id)} onUpdate={update} onDelete={deleteNote} onCycleColor={cycleColor} />)}</>
 }

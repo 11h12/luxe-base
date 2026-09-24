@@ -33,6 +33,7 @@ export function ToggleLeftIcon(props: IconProps) { return <Icon {...props}><circ
 export function ToggleRightIcon(props: IconProps) { return <Icon {...props}><circle cx="15" cy="12" r="3" /><rect width="20" height="14" x="2" y="5" rx="7" /></Icon> }
 export function TrashIcon(props: IconProps) { return <Icon {...props}><path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></Icon> }
 export function FileTextIcon(props: IconProps) { return <Icon {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z" /><path d="M14 2v6h6" /><path d="M8 13h8" /><path d="M8 17h8" /></Icon> }
+export function FileIcon(props: IconProps) { return <Icon {...props}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /></Icon> }
 export function BoldIcon(props: IconProps) { return <Icon {...props}><path d="M6 4h8a4 4 0 0 1 0 8H6z" /><path d="M6 12h9a4 4 0 0 1 0 8H6z" /></Icon> }
 export function ItalicIcon(props: IconProps) { return <Icon {...props}><path d="M19 4h-9" /><path d="M14 20H5" /><path d="m15 4-6 16" /></Icon> }
 export function UnderlineIcon(props: IconProps) { return <Icon {...props}><path d="M6 4v7a6 6 0 0 0 12 0V4" /><path d="M4 20h16" /></Icon> }
