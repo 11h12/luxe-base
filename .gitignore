@@ -6,5 +6,9 @@ dist/
 
 # Keep only the compiled extension assets referenced by newtab.html.
 assets/*
-!assets/build-DXjYdJEG.css
-!assets/build-BWQIC24N.js
+!assets/build-BXsnoJeP.css
+!assets/build-CTPawzhJ.js
+!assets/poppins-400-latin-BwTUGeWf.woff2
+!assets/poppins-400-vietnamese-BGNV62LR.woff2
+!assets/poppins-600-latin-DJVo7c07.woff2
+!assets/poppins-600-vietnamese-BO279Z4F.woff2
