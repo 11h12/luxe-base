@@ -111,18 +111,19 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
     const selectionNode = document.getSelection()?.anchorNode
     const selectionElement = selectionNode instanceof Element ? selectionNode : selectionNode?.parentElement
     const hasMark = (selector: string) => Boolean(selectionElement?.closest(selector) && editor.contains(selectionElement.closest(selector)))
-    if (key === 'bold') return hasMark('b, strong')
-    if (key === 'italic') return hasMark('i, em')
-    if (key === 'underline') return hasMark('u')
-    if (key === 'strike') return hasMark('s, strike')
+    const inHeading = Boolean(selectionElement?.closest('h1, h2, h3, h4, h5, h6'))
+    if (key === 'bold') return hasMark('b, strong') || (!inHeading && document.queryCommandState('bold'))
+    if (key === 'italic') return hasMark('i, em') || document.queryCommandState('italic')
+    if (key === 'underline') return hasMark('u') || document.queryCommandState('underline')
+    if (key === 'strike') return hasMark('s, strike') || document.queryCommandState('strikeThrough')
     if (key === 'bullet') return document.queryCommandState('insertUnorderedList')
     if (key === 'ordered') return document.queryCommandState('insertOrderedList')
     const block = document.queryCommandValue('formatBlock').replace(/[<>]/g, '').toLowerCase()
     return key === 'h2' ? block === 'h2' : key === 'quote' ? block === 'blockquote' : key === 'code' ? block === 'pre' : false
   }
-  const toggleHeading2 = () => {
+  const toggleBlockFormat = (tag: string) => {
     const currentBlock = document.queryCommandValue('formatBlock').replace(/[<>]/g, '').toLowerCase()
-    runCommand('formatBlock', currentBlock === 'h2' ? 'P' : 'H2')
+    runCommand('formatBlock', currentBlock === tag.toLowerCase() ? 'P' : tag)
   }
   const startDrag = (event: React.PointerEvent<HTMLElement>) => {
     if ((event.target as HTMLElement).closest('button, input')) return
@@ -145,11 +146,11 @@ function NoteEditor({ note, onClose, onUpdate, onDelete, onCycleColor }: { note:
     ['italic', 'I', 'Italic', () => runCommand('italic')],
     ['underline', 'U', 'Underline', () => runCommand('underline')],
     ['strike', 'S', 'Strikethrough', () => runCommand('strikeThrough')],
-    ['h2', 'H2', 'Heading 2', toggleHeading2],
+    ['h2', 'H2', 'Heading 2', () => toggleBlockFormat('H2')],
     ['bullet', '•', 'Bulleted list', () => runCommand('insertUnorderedList')],
     ['ordered', '1.', 'Numbered list', () => runCommand('insertOrderedList')],
-    ['quote', '“', 'Block quote', () => runCommand('formatBlock', 'BLOCKQUOTE')],
-    ['code', '</>', 'Code block', () => runCommand('formatBlock', 'PRE')],
+    ['quote', '“', 'Block quote', () => toggleBlockFormat('BLOCKQUOTE')],
+    ['code', '</>', 'Code block', () => toggleBlockFormat('PRE')],
     ['clear', '⌫', 'Clear formatting', clearFormatting],
   ] as const
 
