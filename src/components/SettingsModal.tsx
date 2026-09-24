@@ -19,7 +19,7 @@ const tabs = (t: Copy): { key: Tab; label: string }[] => [
   { key: 'general', label: t.general }, { key: 'mantras', label: t.mantras }, { key: 'tasks', label: t.tasks },
   { key: 'integrations', label: t.integrations }, { key: 'photos', label: t.photos }, { key: 'quotes', label: t.quotes },
 ]
-const backgrounds = (backgroundsData.backgrounds as Background[]).slice(0, 12)
+const backgrounds = backgroundsData.backgrounds as Background[]
 const englishPhotoTitles: Record<string, string> = { 'mountain-sunrise-layers': 'Sunrise over layered mountains', 'alpine-lake-boat': 'Alpine lake', 'alpine-lake-reflection': 'Alpine lake reflections', 'mountains-above-clouds': 'Mountains above the clouds', 'majestic-mountain-valley': 'Majestic mountain valley', 'snow-peak-sunrise': 'Snow peak sunrise', 'white-mountain-wall': 'White mountain wall', 'starry-mountain-night': 'Starry mountain night', 'soft-cloudscape': 'Soft cloudscape', 'turquoise-coast': 'Turquoise coast', 'quiet-alpine-lake': 'Quiet alpine lake', 'highland-ridge-haze': 'Highland ridge in mist' }
 
 function Toggle({ checked, onChange, label }: { checked: boolean; onChange(value: boolean): void; label: string }) {
