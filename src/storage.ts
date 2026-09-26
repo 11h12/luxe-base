@@ -5,7 +5,13 @@ export function read<T>(key: string, fallback: T): T { try { const raw = localSt
 export function write<T>(key: string, value: T) { localStorage.setItem(key, JSON.stringify(value)) }
 export const getSettings = () => ({ ...defaults, ...read<Partial<Settings>>('luxe_settings', {}) })
 export const setSettings = (value: Settings) => write('luxe_settings', value)
-export const getTasks = () => read<Task[]>('luxe_tasks', [])
+export const getTasks = () => read<Task[]>('luxe_tasks', []).map(task => {
+  if (!task.reminderAt) return task
+  const legacyDate = new Date(task.reminderAt)
+  if (Number.isNaN(legacyDate.getTime())) return { ...task, reminderAt: undefined }
+  const dueDate = task.dueDate ?? `${legacyDate.getFullYear()}-${String(legacyDate.getMonth() + 1).padStart(2, '0')}-${String(legacyDate.getDate()).padStart(2, '0')}`
+  return { ...task, dueDate, reminderAt: undefined }
+})
 export const setTasks = (value: Task[]) => write('luxe_tasks', value)
 export const defaultTaskCollections: TaskCollection[] = []
 export const getTaskCollections = () => {

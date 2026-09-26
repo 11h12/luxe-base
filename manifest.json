@@ -4,7 +4,7 @@
   "manifest_version": 3,
   "name": "Luxe New Tab: Focus, Tasks & Calendar",
   "short_name": "Luxe New Tab",
-  "version": "2.5.75",
+  "version": "2.5.83",
   "description": "Transform every new tab into a focus dashboard with tasks, calendar, weather, notes, mantras, and beautiful wallpapers.",
   "icons": {
     "16": "icons/logo.png",
@@ -14,11 +14,16 @@
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
+  "background": {
+    "service_worker": "background.js"
+  },
   "permissions": [
     "activeTab",
     "identity",
     "topSites",
     "notifications",
+    "alarms",
+    "storage",
     "tts"
   ],
   "host_permissions": [

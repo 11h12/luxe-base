@@ -15,6 +15,7 @@ const greetings = {
   vi: ['Chào buổi sáng', 'Chào buổi chiều', 'Chào buổi tối'],
   en: ['Good morning', 'Good afternoon', 'Good evening'],
 } as const
+const localDateKey = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
 function TopSites() {
   return <section className="fixed right-10 top-1/2 z-20 hidden w-[222px] -translate-y-1/2 rounded-[26px] border border-white/10 bg-[#382b0dbd] px-4 py-4 text-white shadow-2xl backdrop-blur-xl xl:block">
@@ -55,11 +56,16 @@ export function App() {
   const mantra = useMemo(() => mantras[index % Math.max(mantras.length, 1)] ?? '', [mantras, index])
   const quote = useMemo(() => quotes[quoteIndex % Math.max(quotes.length, 1)] ?? '', [quotes, quoteIndex])
   const focusedTask = focusSession ? tasks.find(task => task.id === focusSession.taskId) : undefined
-  const dailyGoalTasks = tasks.filter(task => !task.done && task.tags?.includes('daily-goal') && task.reminderAt && new Date(task.reminderAt).toDateString() === new Date().toDateString())
+  const dailyGoalTasks = tasks.filter(task => !task.done && task.tags?.includes('daily-goal') && task.dueDate === localDateKey())
   const hour = new Date().getHours()
   const greeting = greetings[settings.locale][hour < 12 ? 0 : hour < 18 ? 1 : 2]
   useEffect(() => { setSettings(settings) }, [settings])
   useEffect(() => { setTasks(tasks) }, [tasks])
+  useEffect(() => {
+    const runtime = (globalThis as typeof globalThis & { chrome?: { runtime?: { sendMessage(message: unknown): Promise<unknown> } } }).chrome?.runtime
+    if (!runtime) return
+    void runtime.sendMessage({ type: 'sync-task-reminders', tasks: tasks.map(task => ({ id: task.id, title: task.title, dueDate: task.dueDate, dueTime: task.dueTime, done: task.done })) }).catch(() => undefined)
+  }, [tasks])
   useEffect(() => { setTaskCollections(taskCollections) }, [taskCollections])
   useEffect(() => { setFocusSession(focusSession) }, [focusSession])
   useEffect(() => { if (focusSession && !focusedTask) { updateFocusSession(null); setFocusOpen(false) } }, [focusSession, focusedTask])
@@ -78,7 +84,7 @@ export function App() {
   const toggleCompleted = () => updateSettings(value => ({ ...value, showCompletedTasks: !value.showCompletedTasks }))
   const startFocus = (task: Task) => { updateTasks(current => current.map(item => item.id === task.id ? { ...item, status: 'in_progress' } : item)); updateFocusSession({ taskId: task.id, startedAt: new Date().toISOString() }); setFocusOpen(true); setTasksOpen(false) }
   const endFocus = () => { updateFocusSession(null); setFocusOpen(false) }
-  const setTaskDailyGoal = (task: Task) => updateTasks(current => current.map(item => item.id === task.id ? { ...item, tags: [...new Set([...(item.tags ?? []), 'daily-goal'])], reminderAt: new Date().toISOString() } : item))
+  const setTaskDailyGoal = (task: Task) => updateTasks(current => current.map(item => item.id === task.id ? { ...item, tags: [...new Set([...(item.tags ?? []), 'daily-goal'])], dueDate: localDateKey() } : item))
 
   return <main className="relative min-h-screen overflow-hidden bg-[#102334] text-white">
     <div aria-hidden className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `linear-gradient(rgba(0,0,0,.04), rgba(0,0,0,.20)), url("${settings.backgroundUrl}")` }} />
